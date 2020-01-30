@@ -15,7 +15,14 @@ from rest_auth.registration.views import RegisterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('board.urls')),
+    
     path('auth-token/', obtain_jwt_token),
     path('auth-token/verify/', verify_jwt_token),
+
+    #board
+    path('board/', include('board.urls')),
+
+    #main_crawling
+    path('main/', include('main_crawling.urls')),
+
 ]

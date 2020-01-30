@@ -34,6 +34,8 @@ INSTALLED_APPS = [
 
 
     'board',
+    'main_crawling',
+
     
     'rest_framework',
     'rest_framework.authtoken',
@@ -41,6 +43,8 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'allauth',
     'allauth.account',
+
+
 
 
     'corsheaders', #리액트 연결
