@@ -69,7 +69,7 @@ def main_Crawling(html) :
         
         # data[tr.area] = 1
         # print(temp_dict)
-        # print(temp_dict)
+        print(temp_dict)
     return temp_dict
     
 #================================#
@@ -94,8 +94,7 @@ main_dict = main_Crawling(html)
 
 
 # for item in main_dict :
-#      Crawling(item, main_dict[item]['img_src'],main_dict[item]['area'],main_dict[item]['title'],
-#         main_dict[item]['sale'],main_dict[item]['price']).save()
+# n_dict[item]['price']).save()
 for item in main_dict :
      Crawling(item, main_dict[item]['title'],main_dict[item]['area'],main_dict[item]['sale'],main_dict[item]['price'],main_dict[item]['img_src'],main_dict[item]['detail_guide'],main_dict[item]['detail_src']).save()
    

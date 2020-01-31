@@ -1,6 +1,7 @@
 
 import datetime
 import os
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,6 +36,7 @@ INSTALLED_APPS = [
 
     'board',
     'main_crawling',
+    'user',
 
     
     'rest_framework',
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'allauth',
     'allauth.account',
+    'oauth2_provider',
 
 
 
@@ -57,7 +60,7 @@ REST_USE_JWT = True
 ACCOUNT_LOGOUT_ON_GET = True
 
 JWT_AUTH = {
-    # 'JWT_RESPONSE_PAYLOAD_HANDLER': 'backend.utils.my_jwt_response_handler',
+    # 'JWT_RESPONSE_PAYLOAD_HANDLER': 'rest_framework_jwt.utils.jwt_payload_handler',
     'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=10000)
 }
 
@@ -81,13 +84,13 @@ REST_FRAMEWORK = {
         # OAuth
         # 'oauth2_provider.ext.rest_framework.OAuth2Authentication',  # django-oauth-toolkit < 1.0.0
         # django-oauth-toolkit >= 1.0.0
-        # 'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
 
         #fb
         # 'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         # 'rest_framework_social_oauth2.authentication.SocialAuthentication',
     )
-    #  'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    #  'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterTicket'],
 }
 
 
@@ -110,10 +113,12 @@ CORS_ORIGIN_WHITELIST = [
 
 ROOT_URLCONF = 'Ticket.urls'
 
+TEMPLATES_ROOT = os.path.join(BASE_DIR,"templates")
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_ROOT],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,8 +128,27 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    },
+    }, 
 ]
+
+AUTHENTICATION_BACKENDS = (
+    # default
+    'django.contrib.auth.backends.ModelBackend',
+    # email login
+    'allauth.account.auth_backends.AuthenticationBackend',
+    #fb
+    # 'rest_framework_social_oauth2.backends.DjangoOAuth2',
+    # # 'social_core.backends.facebook.FacebookAppOAuth2',
+    # 'social_core.backends.facebook.FacebookOAuth2',
+)
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# none
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = reverse_lazy('account_confirm_complete')
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = reverse_lazy('account_confirm_complete')
+
 
 WSGI_APPLICATION = 'Ticket.wsgi.application'
 
@@ -133,10 +157,17 @@ WSGI_APPLICATION = 'Ticket.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mysql_db',
+        'USER': 'root',
+        'PASSWORD': '1234',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': 'SET sql_mode="STRICT_TRANS_TABLES"'
     }
+}
 }
 
 
@@ -177,3 +208,43 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'fronted', 'build', 'static')
+]
+
+
+
+# Email backend settings for Django
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'skhu017105@skhu.net@'
+EMAIL_HOST_PASSWORD = '950224skhu'
+
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+
+
+ACCOUNT_USERNAME_REQUIRED = False
+
+
+
+# 새로
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_EMAIL_FIELD = 'email'
+ACCOUNT_LOGOUT_ON_GET = True
+
+AUTH_USER_MODEL = 'user.User'
+
+REST_AUTH_SERIALIZERS = {
+    "USER_DETAILS_SERIALIZER": "user.serializers.CustomUserDetailsSerializer",
+}
+REST_AUTH_REGISTER_SERIALIZERS = {
+    "REGISTER_SERIALIZER": "user.serializers.CustomRegisterSerializer",
+    #CustomRegisterSerializer #UserSerializerWithToken
+}
+
+
+ACCOUNT_ADAPTER = 'user.adapter.CustomAccountAdapter'

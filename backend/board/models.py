@@ -1,10 +1,24 @@
-#backend/post/models.py
+from __future__ import unicode_literals
+
 from django.db import models
+from django.utils import timezone
+from user.models import User
 
 class Post(models.Model):
-    title = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=144)
+    
     content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
 
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, blank=True, on_delete=models.CASCADE)
+    
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+ 
     def __str__(self):
-        """A string representation of the model."""
-        return self.title
+        return '%s -%s'%(self.user,self.content)
